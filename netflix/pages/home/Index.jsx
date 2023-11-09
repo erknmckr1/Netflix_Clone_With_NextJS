@@ -61,13 +61,13 @@ function Home() {
               <div className="w-full sm:h-[92px] h-[80px] sm:py-6 sm:px-12 px-3 flex">
                 {/* logo */}
                 <div className="w-1/3 h-full">
-                  <div className="w-[150px] sm:h-[40px] w-[100px] h-full flex items-center ">
+                  <div className="sm:w-[200px] sm:h-[40px] w-[100px] h-full flex items-center ">
                     <Image
-                      src="/logo.png"
+                      src="/removelogo.png"
                       alt=""
                       width={100}
                       height={40}
-                      className="w-[100px] h-[20px]"
+                      className="w-[250px] h-[50px]"
                     />
                   </div>
                 </div>
@@ -114,7 +114,7 @@ function Home() {
                           value={eposta}
                           onChange={(e) => setEposta(e.target.value)}
                         />
-                        <button className="font-semibold bg-[#E50914] text-white text-[18px] sm:text-[25px] sm:h-14 h-12 w-[135px] sm:w-[175px] font-semibold rounded-sm hover:bg-[#943126] transition-all ">
+                        <button className=" bg-[#E50914] text-white text-[18px] sm:text-[25px] sm:h-14 h-12 w-[135px] sm:w-[175px] font-semibold rounded-sm hover:bg-[#943126] transition-all ">
                           {`${"Başlayın >"}`}
                         </button>
                       </div>
