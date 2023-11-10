@@ -88,7 +88,7 @@ function Home() {
                       </option>
                     </select>
                     <button className="bg-[#E50914] text-white w-[100px] h-[32px] rounded-sm sm:ms-4 ms-2 hover:bg-[#943126] transition-all ">
-                      Oturum Aç
+                      <a href="/login">Oturum Aç</a>
                     </button>
                   </div>
                 </div>
@@ -115,7 +115,7 @@ function Home() {
                           onChange={(e) => setEposta(e.target.value)}
                         />
                         <button className=" bg-[#E50914] text-white text-[18px] sm:text-[25px] sm:h-14 h-12 w-[135px] sm:w-[175px] font-semibold rounded-sm hover:bg-[#943126] transition-all ">
-                          {`${"Başlayın >"}`}
+                          <a href="/signup/registration">{`${"Başlayın >"}`}</a>
                         </button>
                       </div>
                     </form>
