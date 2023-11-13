@@ -2,7 +2,9 @@ import React from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
+import { useRouter } from "next/router";
 function Home() {
+  const router = useRouter();
   const [eposta, setEposta] = useState("");
   const [dropwDown, setDropdown] = useState([
     {
@@ -42,6 +44,7 @@ function Home() {
         "Netflix; internet bağlantılı binlerce cihazda ödüllü diziler, filmler, animeler, belgeseller ve daha fazlasını içeren geniş bir arşiv sunan bir streaming hizmetidir. Tek bir reklam olmadan, istediğiniz kadar, istediğiniz zaman izleyebilirsiniz - hepsi aylık düşük bir ücret karşılığında. Her zaman keşfedilecek yeni bir şeyler var, üstelik her hafta yeni diziler ve filmler ekleniyor!",
     },
   ]);
+  const [epostaHata, setEpostaHata] = useState("");
 
   const [isRotated, setIsRotated] = useState(false);
   const handleRotate = (id) => {
@@ -49,6 +52,29 @@ function Home() {
       ...prevState,
       [id]: !prevState[id],
     }));
+  };
+
+  // validate email
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // inputa yazılan girdiyi aldık. Validate fonksıyonuna yolladık ve sonucu donduk.
+  const handleEpostaChange = (e) => {
+    const ePosta = e.target.value;
+    setEposta(ePosta);
+
+    if (!validateEmail(eposta)) {
+      setEpostaHata("Lütfen geçerli bir e-posta giriniz.");
+    } else {
+      setEpostaHata("");
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    router.push("/signup/registration")
   };
   return (
     <div className="w-screen h-screen">
@@ -97,7 +123,9 @@ function Home() {
               <div className="w-full h-auto sm:h-[calc(700px_-_92px)] sm:py-[72px]">
                 <div className="w-full h-full flex flex-col justify-center sm:justify-center sm:items-center">
                   <div className="sm:w-1000px w-full sm:h-[250px] flex text-center justify-center flex-col items-center px-2 sm:px-0">
-                    <p className="sm:text-[60px] text-[32px] font-semibold">Alası Var</p>
+                    <p className="sm:text-[60px] text-[32px] font-semibold">
+                      Alası Var
+                    </p>
                     <p className="sm:text-[24px] text-[18px] mt-[16px]">
                       En iyi dizi, film, belgesel ve çok daha fazlası burada.
                     </p>
@@ -106,17 +134,25 @@ function Home() {
                       ulaşmak için tek yapmanız gereken e-posta adresinizi
                       girmek.
                     </p>
-                    <form className="w-full h-full bg-transparent">
-                      <div className="w-full h-auto flex flex-col sm:flex-row gap-y-3 sm:gap-y-3 items-center justify-center gap-x-2 mt-6">
-                        <Input
-                          placeholder="E-posta adresi"
-                          addProps="h-14 sm:w-[410px] w-[350px] border-2 border-white px-3"
-                          value={eposta}
-                          onChange={(e) => setEposta(e.target.value)}
-                        />
-                        <button className=" bg-[#E50914] text-white text-[18px] sm:text-[25px] sm:h-14 h-12 w-[135px] sm:w-[175px] font-semibold rounded-sm hover:bg-[#943126] transition-all ">
-                          <a href="/signup/registration">{`${"Başlayın >"}`}</a>
-                        </button>
+                    <form
+                      onSubmit={handleSubmit}
+                      className="w-full h-full bg-transparent"
+                    >
+                      <div className="w-full h-auto flex flex-col  gap-y-3 sm:gap-y-3 items-center justify-center gap-x-2 mt-6">
+                        <div className="flex gap-x-4">
+                          <Input
+                            placeholder="E-posta adresi"
+                            addProps="h-14 sm:w-[410px] w-[350px] border-2 border-white px-3"
+                            value={eposta}
+                            onChange={(e) => handleEpostaChange(e)}
+                          />
+                          <button type="submit" className=" bg-[#E50914] text-white text-[18px] sm:text-[25px] sm:h-14 h-12 w-[135px] sm:w-[175px] font-semibold rounded-sm hover:bg-[#943126] transition-all ">
+                            <span>{`${"Başlayın >"}`}</span>
+                          </button>
+                        </div>
+                        <div className="w-[600px] flex justify-start">
+                        <span className="text-left text-red-500">{epostaHata}</span>
+                        </div>
                       </div>
                     </form>
                   </div>
@@ -132,8 +168,8 @@ function Home() {
           {/*  bg black */}
           <div className="w-full h-full bg-black opacity-60 absolute z-30 top-0 left-0"></div>
         </div>
-       {/* part 2 */}
-       <div className="w-full  sm:h-[700px] h-[500px]  border-b-8 border-[#232323]">
+        {/* part 2 */}
+        <div className="w-full  sm:h-[700px] h-[500px]  border-b-8 border-[#232323]">
           <div className="w-full h-full container mx-auto ">
             <div className="w-full h-full flex flex-col sm:flex-row items-center sm:p-20 py-10 sm:py-0">
               {/* text side */}
@@ -167,12 +203,12 @@ function Home() {
             </div>
           </div>
         </div>
-          {/* part 3  */}
+        {/* part 3  */}
         <div className="w-full  sm:h-[700px] h-[560px]  border-b-8 border-[#232323] ">
           <div className="w-full h-full container mx-auto sm:py-20 py-10 ">
             <div className="w-full h-full flex  flex-col sm:flex-row">
-               {/* text side */}
-               <div className="sm:w-1/2 w-full h-full">
+              {/* text side */}
+              <div className="sm:w-1/2 w-full h-full">
                 <div className="w-full h-full flex flex-col items-center justify-center text-center">
                   <span className="sm:text-[48px] text-[32px] font-semibold">
                     Çevrimdışı izlemek için içerikleri indirin
@@ -210,7 +246,6 @@ function Home() {
                   </div>
                 </div>
               </div>
-             
             </div>
           </div>
         </div>
@@ -275,8 +310,8 @@ function Home() {
             </div>
           </div>
         </div>
-         {/* sıkca sorulanlar... */}
-         <div className="w-full sm:min-h-[1000px] border-b-8 border-[#232323]">
+        {/* sıkca sorulanlar... */}
+        <div className="w-full sm:min-h-[1000px] border-b-8 border-[#232323]">
           <div className="w-full h-full container mx-auto">
             <div className="w-full h-full sm:py-20 py-10">
               {/* title */}
@@ -408,20 +443,20 @@ function Home() {
                 </div>
               </div>
               <div className="flex flex-col ">
-                    <select
-                      className="bg-transparent py-[4px] px-[26px] border-[2px] border-white rounded-sm w-[130px]  "
-                      name=""
-                      id=""
-                    >
-                      <option className="bg-transparent" value="türkçe">
-                        Türkçe
-                      </option>
-                      <option className="bg-transparent" value="türkçe">
-                        İngilizce
-                      </option>
-                    </select>
-                    <span className="text-left mt-2">Netflix Türkiye</span>
-                  </div>
+                <select
+                  className="bg-transparent py-[4px] px-[26px] border-[2px] border-white rounded-sm w-[130px]  "
+                  name=""
+                  id=""
+                >
+                  <option className="bg-transparent" value="türkçe">
+                    Türkçe
+                  </option>
+                  <option className="bg-transparent" value="türkçe">
+                    İngilizce
+                  </option>
+                </select>
+                <span className="text-left mt-2">Netflix Türkiye</span>
+              </div>
             </div>
           </div>
         </div>
