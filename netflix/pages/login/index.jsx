@@ -1,6 +1,36 @@
 import React from "react";
 import Image from "next/image";
+import { useState } from "react";
+import Input from "@/components/uı/Input";
+import { signIn } from "next-auth/react";
+import axios from "axios";
 function index() {
+  const [userInfo, setUserInfo] = useState({ email: "", password: "" });
+
+  const handleChangeInput = (e, key) => {
+    setUserInfo((prevState) => ({ ...prevState, [key]: e.target.value }));
+  };
+  
+  const handleSıgnIn = async (e) => {
+    e.preventDefault();
+
+    try {
+      await signIn("credentials",{
+        redirect:false,
+        email:userInfo.email,
+        password:userInfo.password
+      });
+
+      const sessionCheck = await axios.get("/api/auth/session-check");
+      if(sessionCheck.data.authenticated){
+        console.log("Oturum başarı ile açıldı")
+      }else{
+        console.log("Oturum açılamadı tekrar deneyın")
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
   return (
     <div className="w-screen h-auto relative  ">
       {/* navbar start */}
@@ -30,13 +60,15 @@ function index() {
                   <Input
                     addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
                     placeholder="E-posta veya telefon numarası "
+                    onChange={(e)=>{handleChangeInput(e,"email")}}
                   />
                   <Input
                     addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
                     placeholder="Parola"
+                    onChange={(e)=>{handleChangeInput(e,"password")}}
                   />
                 </div>
-                <button className="mt-8 font-bold bg-[#E50914] text-white text-[18px]  sm:h-13 h-12  w-full rounded-sm hover:bg-[#943126] transition-all ">
+                <button onClick={(e)=>handleSıgnIn(e)} className="mt-8 font-bold bg-[#E50914] text-white text-[18px]  sm:h-13 h-12  w-full rounded-sm hover:bg-[#943126] transition-all ">
                   Oturum Aç
                 </button>
                 <div className="w-full h-auto mt-5">
@@ -162,23 +194,3 @@ function index() {
 }
 
 export default index;
-
-function Input(props) {
-  const { addProps, placeholder, ...inputProps } = props;
-
-  return (
-    <div>
-      <label className="relative block cursor-text w-full">
-        <input
-          type="text"
-          className={` text-xs peer  outline-none px-4 pt-2 bg-transparent ${addProps}`}
-          required
-          {...inputProps}
-        ></input>
-        <span className="absolute top-0 left-0 px-4  flex items-center h-full peer-focus:h-7 peer-focus:text-xs peer-valid:h-7 peer-valid:text-xs transition-all">
-          {placeholder}
-        </span>
-      </label>
-    </div>
-  );
-}

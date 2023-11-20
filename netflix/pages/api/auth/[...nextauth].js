@@ -1,37 +1,43 @@
-import NextAuth from "next-auth"
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import pool from "@/lib/dbConnect";
 
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
-        // The name to display on the sign in form (e.g. "Sign in with...")
-        name: "Credentials",
-        // `credentials` is used to generate a form on the sign in page.
-        // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-        // e.g. domain, username, password, 2FA token, etc.
-        // You can pass any HTML attribute to the <input> tag through the object.
-        credentials: {
-          username: { label: "Username", type: "text", placeholder: "jsmith" },
-          password: { label: "Password", type: "password" }
-        },
-        async authorize(credentials, req) {
-            const email = credentials.email;
-            const password = credentials.password;
-    
-          if (user) {
-            // Any object returned will be saved in `user` property of the JWT
-            return user
-          } else {
-            // If you return null then an error will be displayed advising the user to check their details.
-            return null
-    
-            // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        const email = credentials.email;
+        const password = credentials.password;
+
+        try {
+          const user = await pool.query(
+            "SELECT * FROM public.users WHERE email = $1",
+            [email]
+          );
+          if (user.rows.length > 0) {
+
+            const match = password === user.rows[0].password;
+            if (match) {
+              console.log(match)
+              return { id: user.rows[0].id, email: user.rows[0].email };
+              
+            }
+            
           }
+        } catch (error) {
+          console.error("Authorization error:", error);
         }
-      })
+
+        return null;
+      },
+    }),
     // ...add more providers here
   ],
-}
+};
 
-export default NextAuth(authOptions)
+export default NextAuth(authOptions);

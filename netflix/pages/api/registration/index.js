@@ -14,19 +14,22 @@ const handler = async (req, res) => {
       secret_key,
     } = req.body;
     try {
+      // veır tabanında gırılen email var mı yok mu kontrol edıyoruz.
       const checkUser = await pool.query(
         "SELECT * FROM public.users WHERE email = $1",
         [email]
       );
 
+      let createRegister;
+
       if (checkUser.rows.length === 0) {
-        const createRegister = await pool.query(
+        createRegister = await pool.query(
           "INSERT INTO public.users(id, email, password, first_name, last_name, phone_number, secret_key) VALUES ($1,$2,$3,$4,$5,$6,$7);",
           [id, email, password, first_name, last_name, phone_number, secret_key]
         );
       }
 
-      if (createRegister.rowCount > 0) {
+      if (createRegister && createRegister.rowCount > 0) {
         return res.status(201).json({ message: "User created" });
       } else {
         throw new Error("Failed to register user");

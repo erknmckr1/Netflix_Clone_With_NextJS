@@ -6,12 +6,13 @@ import { UserContext } from "@/context/userInfoContext";
 import { useContext } from "react";
 import axios from "axios";
 import { useSession } from 'next-auth/react';
+
 function StepTwo({ setStep }) {
   const { userInfo, setUserInfo,users } = useContext(UserContext);
   const [filteredUser,setFilteredUser] = useState()
   const { data: session } = useSession();
   
-  console.log(session)
+  
   useEffect(()=>{
     const filter =  users.find((item) => item.email === userInfo.email);
     setFilteredUser(filter)
@@ -37,23 +38,37 @@ function StepTwo({ setStep }) {
     e.preventDefault();
     try {
       if (userInfo.password !== "" && userInfo.email !== "") {
-
-          if(!filteredUser ){
-            const createRegister = await axios.post("/api/registration",userInfo)
-            // const res = await signIn("credentials", {
-            //   redirect: false,
-            //   email: userInfo.email,
-            //   password: userInfo.password,
-            // });
-            setStep(2);
-          }else{
-            console.log("Başka bir mail kullanın.")
+        if (!filteredUser) {
+          
+          const createRegister = await axios.post("/api/registration", {
+            ...userInfo,
+          });
+          
+          if (createRegister && createRegister.status === 201) {
+            // Parola başarıyla oluşturulduysa oturumu aç
+            await signIn("credentials", {
+              redirect: false,
+              email: userInfo.email,
+              password: userInfo.password,
+            });
+            const sessionCheck = await axios.get("/api/session-check");
+            if (sessionCheck.data.authenticated) {
+              // Oturum açık
+              setStep(2);
+            } else {
+              console.log("Oturum açılamadı.");
+            }
           }
+        } else {
+          console.log("Başka bir mail kullanın.");
+        }
       }
     } catch (err) {
       console.log(err);
     }
   };
+
+  console.log(userInfo)
   return (
     <div className="sm:h-[656px] w-full">
       <div className="w-full h-full flex items-center justify-center sm:pb-24 pb-20">
