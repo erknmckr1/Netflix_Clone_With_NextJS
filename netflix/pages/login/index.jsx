@@ -4,33 +4,47 @@ import { useState } from "react";
 import Input from "@/components/uı/Input";
 import { signIn } from "next-auth/react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 function index() {
   const [userInfo, setUserInfo] = useState({ email: "", password: "" });
+  const [errors,setErrors] = useState({ email: "", password: "" })
+
+  const { data: session } = useSession();
 
   const handleChangeInput = (e, key) => {
     setUserInfo((prevState) => ({ ...prevState, [key]: e.target.value }));
   };
-  
+
   const handleSıgnIn = async (e) => {
+    // formun varsayılan durumunu degıstır.. yenılenmesın 
     e.preventDefault();
 
     try {
-      await signIn("credentials",{
-        redirect:false,
-        email:userInfo.email,
-        password:userInfo.password
+      // kullanıcını gırdıgı bılgıler ıle credentials yontemını kullanarak 
+      await signIn("credentials", {
+        redirect: false,
+        email: userInfo.email,
+        password: userInfo.password,
       });
 
       const sessionCheck = await axios.get("/api/auth/session-check");
-      if(sessionCheck.data.authenticated){
-        console.log("Oturum başarı ile açıldı")
-      }else{
-        console.log("Oturum açılamadı tekrar deneyın")
+      if (sessionCheck.data.authenticated) {
+        console.log("Oturum başarı ile açıldı");
+        setErrors({
+          email: "",
+          password: "",
+        });
+      } else {
+        console.log("Oturum açılamadı tekrar deneyın");
+        setErrors({
+          email: "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
+          password: "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
+        });
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
   return (
     <div className="w-screen h-auto relative  ">
       {/* navbar start */}
@@ -57,18 +71,41 @@ function index() {
               {/* sign in form */}
               <form className="w-full h-auto mt-6" action="">
                 <div className="w-full h-full flex flex-col gap-y-5">
-                  <Input
-                    addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
-                    placeholder="E-posta veya telefon numarası "
-                    onChange={(e)=>{handleChangeInput(e,"email")}}
-                  />
-                  <Input
-                    addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
-                    placeholder="Parola"
-                    onChange={(e)=>{handleChangeInput(e,"password")}}
-                  />
+                  {/* email */}
+                  <div className="w-full h-full flex flex-col">
+                    <Input
+                      addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
+                      placeholder="E-posta veya telefon numarası "
+                      onChange={(e) => {
+                        handleChangeInput(e, "email");
+                      }}
+                    />
+                    {!session && (
+                      <span className="text-[12px]  text-red-500">
+                        {errors.email}
+                      </span>
+                    )}
+                  </div>
+                  {/* password */}
+                  <div className="w-full h-full flex flex-col">
+                    <Input
+                      addProps="w-full h-14 rounded-md bg-[#333333] text-[20px]"
+                      placeholder="Parola"
+                      onChange={(e) => {
+                        handleChangeInput(e, "password");
+                      }}
+                    />
+                    {!session && (
+                      <span className="text-[12px]  text-red-500">
+                       {errors.password}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <button onClick={(e)=>handleSıgnIn(e)} className="mt-8 font-bold bg-[#E50914] text-white text-[18px]  sm:h-13 h-12  w-full rounded-sm hover:bg-[#943126] transition-all ">
+                <button
+                  onClick={(e) => handleSıgnIn(e)}
+                  className="mt-8 font-bold bg-[#E50914] text-white text-[18px]  sm:h-13 h-12  w-full rounded-sm hover:bg-[#943126] transition-all "
+                >
                   Oturum Aç
                 </button>
                 <div className="w-full h-auto mt-5">
